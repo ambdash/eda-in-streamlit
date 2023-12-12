@@ -26,12 +26,6 @@ column_descriptions = {
     'REG_ADDRESS_PROVINCE': 'Кемеровская область и Приморский край -- самые популярные области регистрации клиентов'
 }
 
-def create_pie_chart(df, col):
-    return px.pie(df[col].value_counts().reset_index(), values=col, names='index')
-
-def create_bar_chart(df, col):
-    return
-
 def main():
     st.title("Exploratory Data Analysis (EDA)")
     
@@ -56,8 +50,9 @@ def main():
 
     st.subheader("1. Распределение Numerical Data:")
 
-    numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns    
-    selected_column = st.selectbox("Select a column:", df.select_dtypes(include=['int64', 'float64']).columns)
+    numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
+    cols_to_select = [x for x in numerical_columns if x not in ['TARGET', 'TERM']]
+    selected_column = st.selectbox("Select a column:", cols_to_select)
 
     if selected_column != 'AGE':
         q1 = df[selected_column].quantile(0.25)
