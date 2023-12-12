@@ -2,3 +2,5 @@ streamlit
 pandas
 plotly_express
 matplotlib
+io
+scipy
