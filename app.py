@@ -89,10 +89,10 @@ def main():
     h_bars = ['REG_ADDRESS_PROVINCE', 'FACT_ADDRESS_PROVINCE','POSTAL_ADDRESS_PROVINCE',
               'GEN_INDUSTRY','GEN_TITLE','JOB_DIR']
     v_bars = ['EDUCATION', 'CHILD_TOTAL','DEPENDANTS', 
-              'N_LOANS', 'TERM', 'TARGET', 'WORK_TIME']
+              'N_LOANS', 'TERM', 'TARGET']
     ordered_col = ['GENDER','EDUCATION','GEN_INDUSTRY',
-                   'GEN_TITLE','JOB_DIR','WORK_TIME', 
-                   'N_LOANS', 'TERM', 'CLOSED_FL','FAMILY_INCOME',
+                   'GEN_TITLE','JOB_DIR', 'N_LOANS', 
+                   'TERM', 'CLOSED_FL','FAMILY_INCOME',
                    'MARITAL_STATUS','CHILD_TOTAL','DEPENDANTS',
                    'SOCSTATUS_PENS_FL','FL_PRESENCE_FL', 'OWN_AUTO',
                    'REG_ADDRESS_PROVINCE', 'FACT_ADDRESS_PROVINCE','POSTAL_ADDRESS_PROVINCE',
@@ -106,14 +106,15 @@ def main():
             fig = px.bar(counts, x='count', y=col, orientation='h')
             fig.update_layout(xaxis_title='Counts', yaxis_title=None)
         if col in v_bars:
+            if 'TARGET' not in col:
+                grouped = df.groupby([col,target_column]).count().reset_index().rename({'AGE':'counts'}, axis=1).sort_values('counts', ascending=False)
+                fig = px.bar(grouped, x=col, y='counts', color=target_column, title=f'Зависимость между {col} и {target_column}')
+                st.plotly_chart(fig)
             counts = df[col].value_counts().sort_values(ascending=False).reset_index()
             fig = px.bar(counts, x=col, y='count')
             fig.update_layout(xaxis_title='Counts', yaxis_title=None)
         fig.update_layout(title_text=f'Распределение признака {col}')    
         st.plotly_chart(fig)  
-        if col in  ['TERM',]:
-            fig = px.box(df, x=target_column, y=col, points="all", title=f'Зависимость между {col} и {target_column}')
-            st.plotly_chart(fig)
         if col in column_descriptions:
             st.write(column_descriptions[col])
 
@@ -127,12 +128,17 @@ def main():
                          y=correlation_matrix.columns,
                          color_continuous_scale='Viridis')
     st.plotly_chart(fig_corr)
-    st.write("""Наибольшая корреляция между """)
+    st.text("""Наибольшая корреляция между:
+             - размером и первым платежом по кредиту (0.54)
+             - размером и сроком кредита (0.5)
+              Также есть корреляция между
+             - кредитом и доходом клиента (0.32)
+             Отсутствует корреляция между таргетом и всеми переменными""")
 
     st.header("4. Зависимость между таргетом и признаками")
     for column in numerical_columns:
         if column != target_column:
-            fig = px.box(df, x=target_column, y=column, points="all", title=f'Зависимость между {column} и {target_column}')
+            fig = px.box(df, x=target_column, y=column, points="all", title=f'Зависимость между {column} и {target_column},')
             st.plotly_chart(fig)
 
 
